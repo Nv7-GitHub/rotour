@@ -1,0 +1,11 @@
+[package]
+name = "rotour"
+version = "0.0.0"
+edition = "2021"
+license-file = "LICENSE"
+description = "The path planner and motion profiler for the Tektite-R Robot Tour kit!"
+repository = "https://github.com/TektiteBiz/rotour"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
