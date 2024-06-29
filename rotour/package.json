@@ -6,6 +6,7 @@
   "engines": {
     "vscode": "^1.90.0"
   },
+  "repository": "https://github.com/TektiteBiz/rotour",
   "categories": [
     "Programming Languages"
   ],
