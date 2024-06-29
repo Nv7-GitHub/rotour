@@ -1,0 +1,35 @@
+{
+  "name": "rotour",
+  "displayName": "RoTour",
+  "description": "The path planner and motion profiler for the Tektite-R Robot Tour kit!",
+  "version": "0.0.1",
+  "engines": {
+    "vscode": "^1.90.0"
+  },
+  "categories": [
+    "Programming Languages"
+  ],
+  "contributes": {
+    "languages": [
+      {
+        "id": "rotour",
+        "aliases": [
+          "RoTour Path",
+          "roto"
+        ],
+        "extensions": [
+          ".roto",
+          ".rotour"
+        ],
+        "configuration": "./language-configuration.json"
+      }
+    ],
+    "grammars": [
+      {
+        "language": "rotour",
+        "scopeName": "source.rotour",
+        "path": "./syntaxes/rotour.tmLanguage.json"
+      }
+    ]
+  }
+}

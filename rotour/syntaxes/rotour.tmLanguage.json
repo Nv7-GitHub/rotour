@@ -1,0 +1,35 @@
+{
+	"$schema": "https://raw.githubusercontent.com/martinring/tmlanguage/master/tmlanguage.json",
+	"name": "RoTour Path",
+	"patterns": [
+		{
+			"include": "#keywords"
+		},
+		{
+			"include": "#number"
+		},
+		{
+			"include": "#comment"
+		}
+	],
+	"repository": {
+		"keywords": {
+			"patterns": [
+				{
+					"name": "keyword.control.rotour",
+					"match": "(?i)\\b(TIME|UP|DOWN|LEFT|RIGHT)\\b"
+				}
+			]
+		},
+		"number": {
+			"match": "\\b(?:-)?(?:[0-9]|\\.)+\\b",
+			"name": "constant.numeric.rotour"
+		},
+		"comment": {
+			"begin": "#",
+			"end": "\\n",
+			"name": "comment.rotour"
+		}
+	},
+	"scopeName": "source.rotour"
+}
