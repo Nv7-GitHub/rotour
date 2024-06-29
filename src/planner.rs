@@ -153,7 +153,11 @@ pub fn plan(path: PathBuf, config: Config) -> Result<PlanningResult, Box<dyn std
 
     // Calculate tw_off
     for i in 0..commands.len() - 1 {
-        //commands[i].tw_off = commands[i + 1].turn.sin().round(); // TODO: Properly calculate tw_off by tracking offset of tw in x and y axes throughout the path, e.x. turning 90deg causes tw_off/2 in y axis and -tw_off/2 in x axis
+        if commands[i + 1].turn.abs() < EPSILON {
+            continue;
+        }
+        commands[i].tw_off -= 0.5;
+        commands[i + 1].tw_off -= 0.5;
     }
 
     // Print resulting path
