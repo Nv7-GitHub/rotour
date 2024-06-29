@@ -47,6 +47,7 @@ pub enum CommandType {
 }
 
 #[repr(C, packed)]
+#[derive(Clone)]
 pub struct Command {
     pub command_type: u8,
     pub ticks: f32,
