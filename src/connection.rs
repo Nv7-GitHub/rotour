@@ -42,27 +42,28 @@ pub enum CommandType {
     Clear,
     Move,
     Turn,
+    End,
     Config, // This one expects ConfigCommand struct after
 }
 
 #[repr(C, packed)]
 pub struct Command {
-    command_type: u8,
-    ticks: f32,
+    pub command_type: u8,
+    pub ticks: f32,
 }
 
 #[repr(C, packed)]
 pub struct ConfigCommand {
-    kp_turn: f32,
-    kp_hold: f32,
-    kp_straight: f32,
-    kp_velocity: f32,
+    pub kp_turn: f32,
+    pub kp_hold: f32,
+    pub kp_straight: f32,
+    pub kp_velocity: f32,
 
-    turn_accel_time: f32,
-    straight_accel_time: f32,
+    pub turn_accel_time: f32,
+    pub straight_accel_time: f32,
 
-    velocity: f32,
-    time: u32,
+    pub velocity: f32,
+    pub time: f32,
 }
 
 pub fn self_test() -> Result<(), Box<dyn std::error::Error>> {

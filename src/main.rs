@@ -1,7 +1,12 @@
+use std::path::PathBuf;
+
 use clap::{error::ErrorKind, CommandFactory, Parser, Subcommand};
 use config::config_command;
+pub use config::Config;
 
 mod connection;
+pub use connection::{Command, CommandType, ConfigCommand};
+mod planner;
 
 #[derive(Parser)]
 #[command(version, about)]
@@ -37,6 +42,14 @@ enum Commands {
     },
     #[command(about = "Run a self-test on the robot.")]
     SelfTest,
+    Run {
+        file: PathBuf,
+    },
+}
+
+fn run_path(path: PathBuf, config: Config) -> Result<(), Box<dyn std::error::Error>> {
+    let res = planner::plan(path, config)?;
+    Ok(())
 }
 
 mod config;
@@ -67,6 +80,7 @@ fn main() {
             straight_accel_time,
         ),
         Commands::SelfTest => connection::self_test(),
+        Commands::Run { file } => run_path(file, config),
     } {
         Cli::command().error(ErrorKind::Io, v.to_string()).exit();
     }

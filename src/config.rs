@@ -3,15 +3,15 @@ use std::fs;
 
 #[derive(Serialize, Deserialize)]
 pub struct Config {
-    ticks_per_cm: u32,
+    pub ticks_per_cm: u32,
 
-    kp_turn: f32,
-    kp_hold: f32,
-    kp_straight: f32,
-    kp_velocity: f32,
+    pub kp_turn: f32,
+    pub kp_hold: f32,
+    pub kp_straight: f32,
+    pub kp_velocity: f32,
 
-    turn_accel_time: f32,
-    straight_accel_time: f32,
+    pub turn_accel_time: f32,
+    pub straight_accel_time: f32,
 }
 
 // Read the config file
