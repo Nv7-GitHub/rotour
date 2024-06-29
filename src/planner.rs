@@ -30,14 +30,7 @@ fn mod_floats(a: f32, b: f32) -> f32 {
     a - (a / (b + 2.0 * EPSILON)).round() * b
 }
 
-fn plan_token(
-    tok: &Token,
-    angle: &mut f32,
-    commands: &mut Vec<Command>,
-    config: &Config,
-    idx: usize,
-    tok_ids: &mut Vec<usize>,
-) {
+fn plan_token(tok: &Token, angle: &mut f32, config: &Config) -> Command {
     let mut dist = match *tok {
         Token::Up(dy) | Token::Down(dy) => dy,
         Token::Left(dx) | Token::Right(dx) => dx,
@@ -51,33 +44,23 @@ fn plan_token(
         dang += 2.0 * PI;
     }
     dang = mod_floats(dang, PI); // Go backwards instead of doing 180deg turn
+    if dang.abs() < EPSILON {
+        dang = 0.0;
+    }
 
     *angle += dang;
-    println!(
-        "{:?} {} {} {}",
-        tok,
-        target_ang.to_degrees(),
-        dang.to_degrees(),
-        angle.to_degrees()
-    );
 
     // Backwards driving
     if ((*angle - target_ang).abs() - PI).abs() < EPSILON {
         dist = -dist;
     }
 
-    if dang.abs() > EPSILON {
-        commands.push(Command {
-            command_type: CommandType::Turn as u8,
-            ticks: dang,
-        });
-        tok_ids.push(idx);
-    }
-    commands.push(Command {
-        command_type: CommandType::Move as u8,
+    Command {
+        command_type: CommandType::TurnMove as u8,
+        turn: dang,
         ticks: dist * config.ticks_per_cm as f32,
-    });
-    tok_ids.push(idx);
+        tw_off: 0.0,
+    }
 }
 
 pub fn plan(path: PathBuf, config: Config) -> Result<PlanningResult, Box<dyn std::error::Error>> {
@@ -87,7 +70,7 @@ pub fn plan(path: PathBuf, config: Config) -> Result<PlanningResult, Box<dyn std
     let file = std::fs::File::open(path)?;
     let reader = std::io::BufReader::new(file);
     let mut tokens = Vec::new();
-    for (ind, line) in reader.lines().enumerate() {
+    for line in reader.lines() {
         let line = line?;
         let parts: Vec<&str> = line.split_whitespace().collect();
         if parts.len() < 2 || parts[0].starts_with("#") {
@@ -111,7 +94,6 @@ pub fn plan(path: PathBuf, config: Config) -> Result<PlanningResult, Box<dyn std
 
     // Plan
     let mut commands = Vec::new();
-    let mut tok_ids = Vec::new();
     let mut xfin = 0.0;
     let mut yfin = 0.0;
 
@@ -134,55 +116,59 @@ pub fn plan(path: PathBuf, config: Config) -> Result<PlanningResult, Box<dyn std
     }
 
     let mut angle = tokens[0].target_angle(); // 0 is pointing east
-    for (i, tok) in tokens.iter().enumerate() {
-        plan_token(tok, &mut angle, &mut commands, &config, i, &mut tok_ids);
+    for tok in tokens.iter() {
+        commands.push(plan_token(tok, &mut angle, &config));
     }
 
-    // Print resulting path
-    for cmd in commands.iter() {
-        let v = cmd.ticks;
-        match cmd.command_type {
-            2 => println!("Move: {} ticks", v),
-            3 => println!("Turn: {} degrees", cmd.ticks.to_degrees()),
-            _ => {}
-        }
-    }
-
-    println!("\n\n");
-
-    // Fix angle
-    let ediff = (tokens.last().unwrap().target_angle() - angle);
+    // Fix ending angle
+    let ediff = tokens.last().unwrap().target_angle() - angle;
     if ediff.abs() > EPSILON {
         // Backtrack to last turn
         for (i, cmd) in commands.iter().enumerate().rev() {
-            if cmd.command_type == CommandType::Turn as u8 {
-                commands[i].ticks += ediff;
-                if commands[i].ticks > PI {
-                    commands[i].ticks -= 2.0 * PI;
+            if cmd.turn.abs() > EPSILON {
+                commands[i].turn += ediff;
+                if commands[i].turn > PI {
+                    commands[i].turn -= 2.0 * PI;
                 } else if commands[i].ticks < -PI {
-                    commands[i].ticks += 2.0 * PI;
+                    commands[i].turn += 2.0 * PI;
                 }
                 angle = tokens.last().unwrap().target_angle();
 
                 // Re-calculate all commands after
                 commands = commands[..=i].to_vec();
 
-                for tok in tokens.iter().skip(tok_ids[i]) {
-                    plan_token(tok, &mut angle, &mut commands, &config, 0, &mut tok_ids);
+                for (j, tok) in tokens.iter().enumerate().skip(i) {
+                    let res = plan_token(tok, &mut angle, &config);
+                    if j == i {
+                        commands[i].ticks = res.ticks;
+                        commands[i].tw_off = res.tw_off;
+                    } else {
+                        commands.push(res);
+                    }
                 }
                 break;
             }
         }
     }
 
+    // Calculate tw_off
+    for i in 0..commands.len() - 1 {
+        //commands[i].tw_off = commands[i + 1].turn.sin().round(); // TODO: Properly calculate tw_off by tracking offset of tw in x and y axes throughout the path, e.x. turning 90deg causes tw_off/2 in y axis and -tw_off/2 in x axis
+    }
+
     // Print resulting path
     for cmd in commands.iter() {
-        let v = cmd.ticks;
-        match cmd.command_type {
-            2 => println!("Move: {} ticks", v),
-            3 => println!("Turn: {} degrees", cmd.ticks.to_degrees()),
-            _ => {}
+        if (cmd.turn).abs() > EPSILON {
+            println!("Turn: {} degrees", cmd.turn.to_degrees());
         }
+        let two = cmd.tw_off;
+        let v = cmd.ticks;
+        println!(
+            "Move: {} ticks {} {} track width",
+            v,
+            if two < 0.0 { "-" } else { "+" },
+            two.abs()
+        );
     }
 
     Ok(PlanningResult {

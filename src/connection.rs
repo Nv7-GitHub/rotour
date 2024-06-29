@@ -40,8 +40,7 @@ pub fn connect() -> Result<Box<dyn SerialPort + 'static>, Box<serialport::Error>
 pub enum CommandType {
     SelfTest,
     Clear,
-    Move,
-    Turn,
+    TurnMove,
     End,
     Config, // This one expects ConfigCommand struct after
 }
@@ -50,7 +49,9 @@ pub enum CommandType {
 #[derive(Clone)]
 pub struct Command {
     pub command_type: u8,
+    pub turn: f32, // always turn so that you move forwards
     pub ticks: f32,
+    pub tw_off: f32, // tw_off*track_width is added to ticks
 }
 
 #[repr(C, packed)]
@@ -73,7 +74,9 @@ pub fn self_test() -> Result<(), Box<dyn std::error::Error>> {
     send_command(
         Command {
             command_type: CommandType::SelfTest as u8,
+            turn: 0.0,
             ticks: 0.0,
+            tw_off: 0.0,
         },
         &mut port,
     )?;
