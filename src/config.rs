@@ -4,8 +4,6 @@ use std::fs;
 #[derive(Serialize, Deserialize)]
 pub struct Config {
     ticks_per_cm: u32,
-    track_width_ticks: u32,
-    static_friction: f32,
 
     kp_turn: f32,
     kp_hold: f32,
@@ -25,8 +23,6 @@ pub fn read_config() -> Result<Config, Box<dyn std::error::Error>> {
         // Create a default config if the file doesn't exist
         let default_config = Config {
             ticks_per_cm: 13,
-            track_width_ticks: 201,
-            static_friction: 35.0,
             kp_turn: 0.5,
             kp_hold: 5.0,
             kp_straight: 1.5,
@@ -60,8 +56,6 @@ pub fn save_config(config: &Config) -> Result<(), Box<dyn std::error::Error>> {
 
 pub fn config_command(
     ticks_per_cm: Option<u32>,
-    track_width_ticks: Option<u32>,
-    static_friction: Option<f32>,
     kp_turn: Option<f32>,
     kp_hold: Option<f32>,
     kp_straight: Option<f32>,
@@ -72,12 +66,6 @@ pub fn config_command(
     let mut config = read_config()?;
     if let Some(v) = ticks_per_cm {
         config.ticks_per_cm = v;
-    }
-    if let Some(v) = track_width_ticks {
-        config.track_width_ticks = v;
-    }
-    if let Some(v) = static_friction {
-        config.static_friction = v;
     }
     if let Some(v) = kp_turn {
         config.kp_turn = v;
@@ -102,8 +90,6 @@ pub fn config_command(
 
     // Print the new config
     println!("ticks_per_cm: {}", config.ticks_per_cm);
-    println!("track_width_ticks: {}", config.track_width_ticks);
-    println!("static_friction: {}\n", config.static_friction);
     println!("kp_turn: {}", config.kp_turn);
     println!("kp_hold: {}", config.kp_hold);
     println!("kp_straight: {}", config.kp_straight);

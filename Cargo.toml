@@ -12,4 +12,5 @@ repository = "https://github.com/TektiteBiz/rotour"
 clap = { version = "4.5.8", features = ["derive"] }
 dirs = "5.0.1"
 serde = { version = "1.0.203", features = ["derive"] }
+serialport = "4.4.0"
 toml = "0.8.14"

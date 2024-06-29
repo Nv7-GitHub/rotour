@@ -1,6 +1,8 @@
 use clap::{error::ErrorKind, CommandFactory, Parser, Subcommand};
 use config::config_command;
 
+mod connection;
+
 #[derive(Parser)]
 #[command(version, about)]
 struct Cli {
@@ -14,12 +16,6 @@ enum Commands {
     Config {
         #[arg(long)]
         ticks_per_cm: Option<u32>,
-
-        #[arg(long)]
-        track_width_ticks: Option<u32>,
-
-        #[arg(long)]
-        static_friction: Option<f32>,
 
         #[arg(long)]
         kp_turn: Option<f32>,
@@ -39,6 +35,8 @@ enum Commands {
         #[arg(long)]
         straight_accel_time: Option<f32>,
     },
+    #[command(about = "Run a self-test on the robot.")]
+    SelfTest,
 }
 
 mod config;
@@ -48,11 +46,11 @@ fn main() {
     if let Err(v) = res {
         Cli::command().error(ErrorKind::Io, v.to_string()).exit();
     }
+    let config = res.unwrap();
+
     if let Err(v) = match args.command {
         Commands::Config {
             ticks_per_cm,
-            track_width_ticks,
-            static_friction,
             kp_turn,
             kp_hold,
             kp_straight,
@@ -61,8 +59,6 @@ fn main() {
             straight_accel_time,
         } => config_command(
             ticks_per_cm,
-            track_width_ticks,
-            static_friction,
             kp_turn,
             kp_hold,
             kp_straight,
@@ -70,6 +66,7 @@ fn main() {
             turn_accel_time,
             straight_accel_time,
         ),
+        Commands::SelfTest => connection::self_test(),
     } {
         Cli::command().error(ErrorKind::Io, v.to_string()).exit();
     }
