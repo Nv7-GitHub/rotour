@@ -2,11 +2,15 @@
   "name": "rotour",
   "displayName": "RoTour",
   "description": "The path planner and motion profiler for the Tektite-R Robot Tour kit!",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "engines": {
     "vscode": "^1.90.0"
   },
-  "repository": "https://github.com/TektiteBiz/rotour",
+  "icon": "assets/rotour.png",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/TektiteBiz/rotour"
+  },
   "categories": [
     "Programming Languages"
   ],
