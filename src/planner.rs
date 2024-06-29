@@ -91,6 +91,9 @@ pub fn plan(path: PathBuf, config: Config) -> Result<PlanningResult, Box<dyn std
         }?;
         tokens.push(tok);
     }
+    if time == 0.0 {
+        return Err("No time specified.".into());
+    }
 
     // Plan
     let mut commands = Vec::new();
@@ -151,13 +154,34 @@ pub fn plan(path: PathBuf, config: Config) -> Result<PlanningResult, Box<dyn std
         }
     }
 
-    // Calculate tw_off
+    // Calculate tw_off, velocity
+    let mut velocity = 0.0;
+    let mut velocity_twoff = 0.0;
+    let mut vtime = time;
     for i in 0..commands.len() - 1 {
+        // Calculate velocity
+        velocity += commands[i].ticks.abs();
+        velocity_twoff += commands[i].tw_off.abs();
+        vtime -= config.straight_accel_time * 2.0;
+        if commands[i + 1].turn.abs() > EPSILON {
+            velocity_twoff += commands[i + 1].turn.abs();
+            vtime -= 2.0 * config.turn_accel_time;
+        }
+        if i == commands.len() - 2 {
+            velocity += commands[i + 1].ticks.abs();
+            velocity_twoff += commands[i + 1].tw_off.abs();
+            vtime -= config.straight_accel_time * 2.0;
+        }
+
+        // Calculate twoff
         if commands[i + 1].turn.abs() < EPSILON {
             continue;
         }
         commands[i].tw_off -= 0.5;
         commands[i + 1].tw_off -= 0.5;
+    }
+    if vtime < 0.0 {
+        return Err("Not enough time. Try increasing the time or decreasing the distance.".into());
     }
 
     // Print resulting path
@@ -174,6 +198,7 @@ pub fn plan(path: PathBuf, config: Config) -> Result<PlanningResult, Box<dyn std
             two.abs()
         );
     }
+    println!("Approximate Velocity: {} ticks/cm", velocity / time);
 
     Ok(PlanningResult {
         commands,
@@ -184,8 +209,11 @@ pub fn plan(path: PathBuf, config: Config) -> Result<PlanningResult, Box<dyn std
             kp_velocity: config.kp_velocity,
             turn_accel_time: config.turn_accel_time,
             straight_accel_time: config.straight_accel_time,
-            velocity: 0.0, // TODO: Calculate velocity in ticks per cm
-            time: time as f32,
+
+            velocity, // TODO: Calculate velocity in ticks per cm
+            velocity_twoff,
+            time,
+            vtime,
         },
     })
 }

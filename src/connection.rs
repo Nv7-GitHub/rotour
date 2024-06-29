@@ -65,7 +65,10 @@ pub struct ConfigCommand {
     pub straight_accel_time: f32,
 
     pub velocity: f32,
+    pub velocity_twoff: f32,
+    // Velocity = (velocity+velocity_twoff*track_width)/time
     pub time: f32,
+    pub vtime: f32,
 }
 
 pub fn self_test() -> Result<(), Box<dyn std::error::Error>> {
