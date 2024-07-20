@@ -5,6 +5,7 @@ use config::config_command;
 pub use config::Config;
 
 mod connection;
+use connection::transmit;
 pub use connection::{Command, CommandType, ConfigCommand};
 mod planner;
 
@@ -49,6 +50,7 @@ enum Commands {
 
 fn run_path(path: PathBuf, config: Config) -> Result<(), Box<dyn std::error::Error>> {
     let res = planner::plan(path, config)?;
+    transmit(res.config, res.commands)?;
     Ok(())
 }
 

@@ -58,7 +58,7 @@ fn plan_token(tok: &Token, angle: &mut f32, config: &Config) -> Command {
     Command {
         command_type: CommandType::TurnMove as u8,
         turn: dang,
-        ticks: dist * config.ticks_per_cm as f32,
+        ticks: (dist * config.ticks_per_cm as f32) as i32,
         tw_off: 0.0,
     }
 }
@@ -132,7 +132,7 @@ pub fn plan(path: PathBuf, config: Config) -> Result<PlanningResult, Box<dyn std
                 commands[i].turn += ediff;
                 if commands[i].turn > PI {
                     commands[i].turn -= 2.0 * PI;
-                } else if commands[i].ticks < -PI {
+                } else if commands[i].turn < -PI {
                     commands[i].turn += 2.0 * PI;
                 }
                 angle = tokens.last().unwrap().target_angle();
@@ -160,7 +160,7 @@ pub fn plan(path: PathBuf, config: Config) -> Result<PlanningResult, Box<dyn std
     let mut vtime = time;
     for i in 0..commands.len() - 1 {
         // Calculate velocity
-        velocity += commands[i].ticks.abs();
+        velocity += commands[i].ticks.abs() as f32;
         velocity_twoff += commands[i].tw_off.abs();
         vtime -= config.straight_accel_time * 2.0;
         if commands[i + 1].turn.abs() > EPSILON {
@@ -168,7 +168,7 @@ pub fn plan(path: PathBuf, config: Config) -> Result<PlanningResult, Box<dyn std
             vtime -= 2.0 * config.turn_accel_time;
         }
         if i == commands.len() - 2 {
-            velocity += commands[i + 1].ticks.abs();
+            velocity += commands[i + 1].ticks.abs() as f32;
             velocity_twoff += commands[i + 1].tw_off.abs();
             vtime -= config.straight_accel_time * 2.0;
         }

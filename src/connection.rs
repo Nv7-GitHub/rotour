@@ -39,10 +39,8 @@ pub fn connect() -> Result<Box<dyn SerialPort + 'static>, Box<serialport::Error>
 #[derive(Copy, Clone)]
 pub enum CommandType {
     SelfTest,
-    Clear,
+    Transmit,
     TurnMove,
-    End,
-    Config, // This one expects ConfigCommand struct after
 }
 
 #[repr(C, packed)]
@@ -50,7 +48,7 @@ pub enum CommandType {
 pub struct Command {
     pub command_type: u8,
     pub turn: f32, // always turn so that you move forwards
-    pub ticks: f32,
+    pub ticks: i32,
     pub tw_off: f32, // tw_off*track_width is added to ticks
 }
 
@@ -78,7 +76,7 @@ pub fn self_test() -> Result<(), Box<dyn std::error::Error>> {
         Command {
             command_type: CommandType::SelfTest as u8,
             turn: 0.0,
-            ticks: 0.0,
+            ticks: 0,
             tw_off: 0.0,
         },
         &mut port,
@@ -96,6 +94,40 @@ fn send_command(command: Command, port: &mut Box<dyn SerialPort>) -> Result<(), 
     };
     port.write_all(data)?;
     port.flush()?;
+
+    Ok(())
+}
+
+pub fn transmit(cfg: ConfigCommand, moves: Vec<Command>) -> Result<(), Box<dyn std::error::Error>> {
+    // Write config
+    let mut port = connect()?;
+    port.clear(serialport::ClearBuffer::Input)?;
+    let data = unsafe {
+        slice::from_raw_parts(
+            &cfg as *const ConfigCommand as *const u8,
+            mem::size_of::<ConfigCommand>(),
+        )
+    };
+    port.write_all(data)?;
+    port.flush()?;
+    port.read_exact(&mut [0; 1])
+        .expect("Failed to read from Serial port"); // Wait for ack
+
+    // Transmit moves
+    send_command(
+        Command {
+            command_type: CommandType::Transmit as u8,
+            turn: 0.0,
+            ticks: moves.len() as i32,
+            tw_off: 0.0,
+        },
+        &mut port,
+    )?;
+    for m in moves {
+        port.read_exact(&mut [0; 1])
+            .expect("Failed to read from Serial port"); // Wait for ack
+        send_command(m, &mut port)?;
+    }
 
     Ok(())
 }
