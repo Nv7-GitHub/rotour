@@ -82,6 +82,8 @@ pub fn self_test() -> Result<(), Box<dyn std::error::Error>> {
         &mut port,
     )?;
 
+    println!("Send self-test command! Turn on battery power, unplug the robot and press the green button to start the self-test.");
+
     Ok(())
 }
 
