@@ -58,6 +58,7 @@ pub struct ConfigCommand {
     pub kp_hold: f32,
     pub kp_straight: f32,
     pub kp_velocity: f32,
+    pub dowel_off: f32, // Distance of the dowel from the center in ticks
 
     pub turn_accel_time: f32,
     pub straight_accel_time: f32,
@@ -65,6 +66,7 @@ pub struct ConfigCommand {
     pub velocity: f32,
     pub velocity_twoff: f32,
     // Velocity = (velocity+velocity_twoff*track_width)/time
+    pub friction: f32,
     pub time: f32,
     pub vtime: f32,
 }
@@ -82,7 +84,7 @@ pub fn self_test() -> Result<(), Box<dyn std::error::Error>> {
         &mut port,
     )?;
 
-    println!("Send self-test command! Turn on battery power, unplug the robot and press the green button to start the self-test.");
+    println!("Sent self-test command! Turn on battery power, unplug the robot and press the green button to start the self-test.");
 
     Ok(())
 }

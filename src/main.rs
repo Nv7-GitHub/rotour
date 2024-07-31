@@ -40,6 +40,12 @@ enum Commands {
 
         #[arg(long)]
         straight_accel_time: Option<f32>,
+
+        #[arg(long)]
+        friction: Option<f32>,
+
+        #[arg(long)]
+        dowel_off: Option<f32>,
     },
     #[command(about = "Run a self-test on the robot.")]
     SelfTest,
@@ -72,6 +78,8 @@ fn main() {
             kp_velocity,
             turn_accel_time,
             straight_accel_time,
+            friction,
+            dowel_off,
         } => config_command(
             ticks_per_cm,
             kp_turn,
@@ -80,6 +88,8 @@ fn main() {
             kp_velocity,
             turn_accel_time,
             straight_accel_time,
+            friction,
+            dowel_off,
         ),
         Commands::SelfTest => connection::self_test(),
         Commands::Run { file } => run_path(file, config),

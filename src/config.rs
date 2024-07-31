@@ -12,6 +12,8 @@ pub struct Config {
 
     pub turn_accel_time: f32,
     pub straight_accel_time: f32,
+    pub friction: f32,
+    pub dowel_off: f32,
 }
 
 // Read the config file
@@ -29,6 +31,8 @@ pub fn read_config() -> Result<Config, Box<dyn std::error::Error>> {
             kp_velocity: 5.0,
             turn_accel_time: 0.25,
             straight_accel_time: 0.5,
+            friction: 0.1,
+            dowel_off: 100.0,
         };
 
         let config_str = toml::to_string(&default_config)?;
@@ -62,6 +66,8 @@ pub fn config_command(
     kp_velocity: Option<f32>,
     turn_accel_time: Option<f32>,
     straight_accel_time: Option<f32>,
+    friction: Option<f32>,
+    dowel_off: Option<f32>,
 ) -> Result<(), Box<dyn std::error::Error>> {
     let mut config = read_config()?;
     if let Some(v) = ticks_per_cm {
@@ -84,6 +90,12 @@ pub fn config_command(
     }
     if let Some(v) = straight_accel_time {
         config.straight_accel_time = v;
+    }
+    if let Some(v) = friction {
+        config.friction = v;
+    }
+    if let Some(v) = dowel_off {
+        config.dowel_off = v;
     }
 
     save_config(&config)?;
