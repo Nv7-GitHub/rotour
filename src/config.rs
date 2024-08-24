@@ -108,6 +108,8 @@ pub fn config_command(
     println!("kp_velocity: {}\n", config.kp_velocity);
     println!("turn_accel_time: {}", config.turn_accel_time);
     println!("straight_accel_time: {}", config.straight_accel_time);
+    println!("friction: {}", config.friction);
+    println!("dowel_off: {}", config.dowel_off);
 
     Ok(())
 }

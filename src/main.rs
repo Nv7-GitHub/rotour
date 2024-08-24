@@ -5,6 +5,7 @@ use config::config_command;
 pub use config::Config;
 
 mod connection;
+pub use config::read_config;
 use connection::transmit;
 pub use connection::{Command, CommandType, ConfigCommand};
 mod planner;

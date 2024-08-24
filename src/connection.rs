@@ -1,3 +1,4 @@
+use super::read_config;
 use std::io::Read;
 use std::mem;
 use std::slice;
@@ -41,6 +42,7 @@ pub enum CommandType {
     SelfTest,
     Transmit,
     TurnMove,
+    ReadConfig,
 }
 
 #[repr(C, packed)]
@@ -72,7 +74,36 @@ pub struct ConfigCommand {
 }
 
 pub fn self_test() -> Result<(), Box<dyn std::error::Error>> {
+    // Send config
+    println!("Transmitting config...");
     let mut port = connect()?;
+    let config = read_config()?;
+    port.clear(serialport::ClearBuffer::Input)?;
+    let data = unsafe {
+        slice::from_raw_parts(
+            &ConfigCommand {
+                kp_turn: config.kp_turn,
+                kp_hold: config.kp_hold,
+                kp_straight: config.kp_straight,
+                kp_velocity: config.kp_velocity,
+                dowel_off: config.dowel_off,
+                turn_accel_time: config.turn_accel_time,
+                straight_accel_time: config.straight_accel_time,
+                friction: config.friction,
+                velocity: 10000.0,
+                velocity_twoff: 0.0,
+                time: 10.0,
+                vtime: 0.0,
+            } as *const ConfigCommand as *const u8,
+            mem::size_of::<ConfigCommand>(),
+        )
+    };
+    port.write_all(data)?;
+    port.flush()?;
+    port.read_exact(&mut [0; 1])
+        .expect("Failed to read from Serial port"); // Wait for ack
+
+    // Send command
     port.clear(serialport::ClearBuffer::Input)?;
     send_command(
         Command {
