@@ -155,6 +155,12 @@ pub fn plan(path: PathBuf, config: Config) -> Result<PlanningResult, Box<dyn std
         }
     }
 
+    // Add dowel_off
+    commands[0].ticks +=
+        (config.dowel_off * (config.ticks_per_cm as f32)) as i32 * commands[0].ticks.signum();
+    commands.last_mut().unwrap().ticks -= (config.dowel_off * (config.ticks_per_cm as f32)) as i32
+        * commands[commands.len() - 1].ticks.signum();
+
     // Calculate tw_off, velocity
     let mut velocity = 0.0;
     let mut velocity_twoff = 0.0;

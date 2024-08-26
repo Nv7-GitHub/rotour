@@ -93,7 +93,7 @@ pub fn self_test() -> Result<(), Box<dyn std::error::Error>> {
                 velocity: 10000.0,
                 velocity_twoff: 0.0,
                 time: 10.0,
-                vtime: 0.0,
+                vtime: 10.0,
             } as *const ConfigCommand as *const u8,
             mem::size_of::<ConfigCommand>(),
         )
