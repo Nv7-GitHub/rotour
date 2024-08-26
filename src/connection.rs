@@ -134,6 +134,8 @@ fn send_command(command: Command, port: &mut Box<dyn SerialPort>) -> Result<(), 
 }
 
 pub fn transmit(cfg: ConfigCommand, moves: Vec<Command>) -> Result<(), Box<dyn std::error::Error>> {
+    println!("Sending moves...");
+
     // Write config
     let mut port = connect()?;
     port.clear(serialport::ClearBuffer::Input)?;
@@ -163,6 +165,8 @@ pub fn transmit(cfg: ConfigCommand, moves: Vec<Command>) -> Result<(), Box<dyn s
             .expect("Failed to read from Serial port"); // Wait for ack
         send_command(m, &mut port)?;
     }
+
+    println!("Done!");
 
     Ok(())
 }

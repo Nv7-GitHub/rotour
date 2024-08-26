@@ -1,6 +1,7 @@
 use super::{Command, CommandType, Config, ConfigCommand};
 use std::{f32::consts::PI, io::BufRead, path::PathBuf};
 const EPSILON: f32 = 1e-4;
+const CM_PER_SQUARE: f32 = 50.0;
 
 pub struct PlanningResult {
     pub commands: Vec<Command>,
@@ -58,7 +59,7 @@ fn plan_token(tok: &Token, angle: &mut f32, config: &Config) -> Command {
     Command {
         command_type: CommandType::TurnMove as u8,
         turn: dang,
-        ticks: (dist * config.ticks_per_cm as f32) as i32,
+        ticks: (dist * config.ticks_per_cm as f32 * CM_PER_SQUARE) as i32,
         tw_off: 0.0,
     }
 }
@@ -198,7 +199,7 @@ pub fn plan(path: PathBuf, config: Config) -> Result<PlanningResult, Box<dyn std
             two.abs()
         );
     }
-    println!("Approximate Velocity: {} ticks/cm", velocity / time);
+    println!("Approximate Velocity: {} ticks/second", velocity / time);
 
     Ok(PlanningResult {
         commands,
