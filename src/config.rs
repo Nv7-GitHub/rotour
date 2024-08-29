@@ -24,15 +24,15 @@ pub fn read_config() -> Result<Config, Box<dyn std::error::Error>> {
     if !config_path.exists() {
         // Create a default config if the file doesn't exist
         let default_config = Config {
-            ticks_per_cm: 13,
+            ticks_per_cm: 100,
             kp_turn: 0.5,
-            kp_hold: 5.0,
-            kp_straight: 1.5,
-            kp_velocity: 5.0,
+            kp_hold: 0.01,
+            kp_straight: 0.005,
+            kp_velocity: 0.000005,
             turn_accel_time: 0.25,
             straight_accel_time: 0.5,
-            friction: 0.1,
-            dowel_off: 100.0,
+            friction: 0.2,
+            dowel_off: 6.562, // CM
         };
 
         let config_str = toml::to_string(&default_config)?;
