@@ -3,7 +3,7 @@ use std::fs;
 
 #[derive(Serialize, Deserialize)]
 pub struct Config {
-    pub ticks_per_cm: u32,
+    pub ticks_per_cm: f32,
 
     pub kp_turn: f32,
     pub kp_hold: f32,
@@ -24,7 +24,7 @@ pub fn read_config() -> Result<Config, Box<dyn std::error::Error>> {
     if !config_path.exists() {
         // Create a default config if the file doesn't exist
         let default_config = Config {
-            ticks_per_cm: 100,
+            ticks_per_cm: 84.6,
             kp_turn: 0.5,
             kp_hold: 0.01,
             kp_straight: 0.005,
@@ -59,7 +59,7 @@ pub fn save_config(config: &Config) -> Result<(), Box<dyn std::error::Error>> {
 }
 
 pub fn config_command(
-    ticks_per_cm: Option<u32>,
+    ticks_per_cm: Option<f32>,
     kp_turn: Option<f32>,
     kp_hold: Option<f32>,
     kp_straight: Option<f32>,

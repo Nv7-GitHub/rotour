@@ -1,6 +1,6 @@
 use super::{Command, CommandType, Config, ConfigCommand};
-use std::{f32::consts::PI, io::BufRead, path::PathBuf};
-const EPSILON: f32 = 1e-4;
+use std::{f64::consts::PI, io::BufRead, path::PathBuf};
+const EPSILON: f64 = 1e-4;
 const CM_PER_SQUARE: f32 = 50.0;
 
 pub struct PlanningResult {
@@ -17,7 +17,7 @@ enum Token {
 }
 
 impl Token {
-    fn target_angle(&self) -> f32 {
+    fn target_angle(&self) -> f64 {
         match self {
             Token::Up(_) => PI / 2.0,
             Token::Down(_) => -PI / 2.0,
@@ -27,11 +27,11 @@ impl Token {
     }
 }
 
-fn mod_floats(a: f32, b: f32) -> f32 {
+fn mod_floats(a: f64, b: f64) -> f64 {
     a - (a / (b + 2.0 * EPSILON)).round() * b
 }
 
-fn plan_token(tok: &Token, angle: &mut f32, config: &Config) -> Command {
+fn plan_token(tok: &Token, angle: &mut f64, config: &Config) -> Command {
     let mut dist = match *tok {
         Token::Up(dy) | Token::Down(dy) => dy,
         Token::Left(dx) | Token::Right(dx) => dx,
@@ -50,6 +50,7 @@ fn plan_token(tok: &Token, angle: &mut f32, config: &Config) -> Command {
     }
 
     *angle += dang;
+    *angle = mod_floats(*angle, 2.0 * PI); // Make sure angle < 360
 
     // Backwards driving
     if ((*angle - target_ang).abs() - PI).abs() < EPSILON {
@@ -58,7 +59,7 @@ fn plan_token(tok: &Token, angle: &mut f32, config: &Config) -> Command {
 
     Command {
         command_type: CommandType::TurnMove as u8,
-        turn: dang,
+        turn: dang as f32,
         ticks: (dist * config.ticks_per_cm as f32 * CM_PER_SQUARE) as i32,
         tw_off: 0.0,
     }
@@ -129,12 +130,12 @@ pub fn plan(path: PathBuf, config: Config) -> Result<PlanningResult, Box<dyn std
     if ediff.abs() > EPSILON {
         // Backtrack to last turn
         for (i, cmd) in commands.iter().enumerate().rev() {
-            if cmd.turn.abs() > EPSILON {
-                commands[i].turn += ediff;
-                if commands[i].turn > PI {
-                    commands[i].turn -= 2.0 * PI;
-                } else if commands[i].turn < -PI {
-                    commands[i].turn += 2.0 * PI;
+            if cmd.turn.abs() > EPSILON as f32 {
+                commands[i].turn += ediff as f32;
+                if commands[i].turn as f64 > PI {
+                    commands[i].turn -= (2.0 * PI) as f32;
+                } else if (commands[i].turn as f64) < -PI {
+                    commands[i].turn += (2.0 * PI) as f32;
                 }
                 angle = tokens.last().unwrap().target_angle();
 
@@ -170,7 +171,7 @@ pub fn plan(path: PathBuf, config: Config) -> Result<PlanningResult, Box<dyn std
         velocity += commands[i].ticks.abs() as f32;
         velocity_twoff += commands[i].tw_off.abs();
         vtime -= config.straight_accel_time * 2.0;
-        if commands[i + 1].turn.abs() > EPSILON {
+        if commands[i + 1].turn.abs() > EPSILON as f32 {
             velocity_twoff += commands[i + 1].turn.abs();
             vtime -= 2.0 * config.turn_accel_time;
         }
@@ -181,7 +182,7 @@ pub fn plan(path: PathBuf, config: Config) -> Result<PlanningResult, Box<dyn std
         }
 
         // Calculate twoff
-        if commands[i + 1].turn.abs() < EPSILON {
+        if commands[i + 1].turn.abs() < EPSILON as f32 {
             continue;
         }
         commands[i].tw_off -= 0.5;
@@ -193,7 +194,7 @@ pub fn plan(path: PathBuf, config: Config) -> Result<PlanningResult, Box<dyn std
 
     // Print resulting path
     for cmd in commands.iter() {
-        if (cmd.turn).abs() > EPSILON {
+        if (cmd.turn).abs() > EPSILON as f32 {
             println!("Turn: {} degrees", cmd.turn.to_degrees());
         }
         let two = cmd.tw_off;
@@ -205,7 +206,7 @@ pub fn plan(path: PathBuf, config: Config) -> Result<PlanningResult, Box<dyn std
             two.abs()
         );
     }
-    println!("Approximate Velocity: {} ticks/second", velocity / time);
+    println!("Approximate Velocity: {} ticks/second", velocity / vtime);
 
     Ok(PlanningResult {
         commands,

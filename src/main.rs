@@ -22,7 +22,7 @@ enum Commands {
     #[command(about = "Configure Tektite-R! Does not require a connection to the robot.")]
     Config {
         #[arg(long)]
-        ticks_per_cm: Option<u32>,
+        ticks_per_cm: Option<f32>,
 
         #[arg(long)]
         kp_turn: Option<f32>,
