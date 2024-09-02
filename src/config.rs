@@ -25,13 +25,13 @@ pub fn read_config() -> Result<Config, Box<dyn std::error::Error>> {
         // Create a default config if the file doesn't exist
         let default_config = Config {
             ticks_per_cm: 84.6,
-            kp_turn: 0.5,
+            kp_turn: 0.002,
             kp_hold: 0.01,
-            kp_straight: 0.005,
-            kp_velocity: 0.000005,
-            turn_accel_time: 0.25,
-            straight_accel_time: 0.5,
-            friction: 0.2,
+            kp_straight: 0.002,
+            kp_velocity: 0.000002,
+            turn_accel_time: 0.125,
+            straight_accel_time: 0.25,
+            friction: 0.15,
             dowel_off: 6.562, // CM
         };
 
