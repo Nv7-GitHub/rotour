@@ -219,6 +219,7 @@ pub fn plan(path: PathBuf, config: Config) -> Result<PlanningResult, Box<dyn std
             straight_accel_time: config.straight_accel_time,
             friction: config.friction,
             dowel_off: config.dowel_off,
+            reverse: if config.reverse { 1 } else { 0 },
 
             velocity, // TODO: Calculate velocity in ticks per cm
             velocity_twoff,

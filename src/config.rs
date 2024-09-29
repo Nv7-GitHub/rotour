@@ -14,6 +14,7 @@ pub struct Config {
     pub straight_accel_time: f32,
     pub friction: f32,
     pub dowel_off: f32,
+    pub reverse: bool,
 }
 
 // Read the config file
@@ -33,6 +34,7 @@ pub fn read_config() -> Result<Config, Box<dyn std::error::Error>> {
             straight_accel_time: 0.25,
             friction: 0.15,
             dowel_off: 6.562, // CM
+            reverse: false,
         };
 
         let config_str = toml::to_string(&default_config)?;
@@ -68,6 +70,7 @@ pub fn config_command(
     straight_accel_time: Option<f32>,
     friction: Option<f32>,
     dowel_off: Option<f32>,
+    reverse: Option<bool>,
 ) -> Result<(), Box<dyn std::error::Error>> {
     let mut config = read_config()?;
     if let Some(v) = ticks_per_cm {
@@ -97,6 +100,9 @@ pub fn config_command(
     if let Some(v) = dowel_off {
         config.dowel_off = v;
     }
+    if let Some(v) = reverse {
+        config.reverse = v;
+    }
 
     save_config(&config)?;
 
@@ -110,6 +116,7 @@ pub fn config_command(
     println!("straight_accel_time: {}", config.straight_accel_time);
     println!("friction: {}", config.friction);
     println!("dowel_off: {}", config.dowel_off);
+    println!("reverse: {}", config.reverse);
 
     Ok(())
 }

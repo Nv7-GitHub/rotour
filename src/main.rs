@@ -47,6 +47,9 @@ enum Commands {
 
         #[arg(long)]
         dowel_off: Option<f32>,
+
+        #[arg(long)]
+        reverse: Option<bool>,
     },
     #[command(about = "Run a self-test on the robot.")]
     SelfTest,
@@ -81,6 +84,7 @@ fn main() {
             straight_accel_time,
             friction,
             dowel_off,
+            reverse,
         } => config_command(
             ticks_per_cm,
             kp_turn,
@@ -91,6 +95,7 @@ fn main() {
             straight_accel_time,
             friction,
             dowel_off,
+            reverse,
         ),
         Commands::SelfTest => connection::self_test(),
         Commands::Run { file } => run_path(file, config),
