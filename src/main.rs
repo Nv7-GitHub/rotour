@@ -25,7 +25,7 @@ enum Commands {
         ticks_per_cm: Option<f32>,
 
         #[arg(long)]
-        kp_turn: Option<f32>,
+        kp_move: Option<f32>,
 
         #[arg(long)]
         kp_hold: Option<f32>,
@@ -76,7 +76,7 @@ fn main() {
     if let Err(v) = match args.command {
         Commands::Config {
             ticks_per_cm,
-            kp_turn,
+            kp_move,
             kp_hold,
             kp_straight,
             kp_velocity,
@@ -87,7 +87,7 @@ fn main() {
             reverse,
         } => config_command(
             ticks_per_cm,
-            kp_turn,
+            kp_move,
             kp_hold,
             kp_straight,
             kp_velocity,

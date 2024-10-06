@@ -56,7 +56,7 @@ pub struct Command {
 
 #[repr(C, packed)]
 pub struct ConfigCommand {
-    pub kp_turn: f32,
+    pub kp_move: f32,
     pub kp_hold: f32,
     pub kp_straight: f32,
     pub kp_velocity: f32,
@@ -83,7 +83,7 @@ pub fn self_test() -> Result<(), Box<dyn std::error::Error>> {
     let data = unsafe {
         slice::from_raw_parts(
             &ConfigCommand {
-                kp_turn: config.kp_turn,
+                kp_move: config.kp_move,
                 kp_hold: config.kp_hold,
                 kp_straight: config.kp_straight,
                 kp_velocity: config.kp_velocity,

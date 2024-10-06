@@ -5,7 +5,7 @@ use std::fs;
 pub struct Config {
     pub ticks_per_cm: f32,
 
-    pub kp_turn: f32,
+    pub kp_move: f32,
     pub kp_hold: f32,
     pub kp_straight: f32,
     pub kp_velocity: f32,
@@ -26,13 +26,13 @@ pub fn read_config() -> Result<Config, Box<dyn std::error::Error>> {
         // Create a default config if the file doesn't exist
         let default_config = Config {
             ticks_per_cm: 84.6,
-            kp_turn: 0.002,
+            kp_move: 1.5,
             kp_hold: 0.01,
-            kp_straight: 0.002,
-            kp_velocity: 0.000002,
-            turn_accel_time: 0.125,
-            straight_accel_time: 0.25,
-            friction: 0.15,
+            kp_straight: 2.5,
+            kp_velocity: 0.000003,
+            turn_accel_time: 0.25,
+            straight_accel_time: 0.5,
+            friction: 0.12,
             dowel_off: 6.562, // CM
             reverse: false,
         };
@@ -62,7 +62,7 @@ pub fn save_config(config: &Config) -> Result<(), Box<dyn std::error::Error>> {
 
 pub fn config_command(
     ticks_per_cm: Option<f32>,
-    kp_turn: Option<f32>,
+    kp_move: Option<f32>,
     kp_hold: Option<f32>,
     kp_straight: Option<f32>,
     kp_velocity: Option<f32>,
@@ -76,8 +76,8 @@ pub fn config_command(
     if let Some(v) = ticks_per_cm {
         config.ticks_per_cm = v;
     }
-    if let Some(v) = kp_turn {
-        config.kp_turn = v;
+    if let Some(v) = kp_move {
+        config.kp_move = v;
     }
     if let Some(v) = kp_hold {
         config.kp_hold = v;
@@ -108,7 +108,7 @@ pub fn config_command(
 
     // Print the new config
     println!("ticks_per_cm: {}", config.ticks_per_cm);
-    println!("kp_turn: {}", config.kp_turn);
+    println!("kp_move: {}", config.kp_move);
     println!("kp_hold: {}", config.kp_hold);
     println!("kp_straight: {}", config.kp_straight);
     println!("kp_velocity: {}\n", config.kp_velocity);

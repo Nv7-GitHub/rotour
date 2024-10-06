@@ -211,7 +211,7 @@ pub fn plan(path: PathBuf, config: Config) -> Result<PlanningResult, Box<dyn std
     Ok(PlanningResult {
         commands,
         config: ConfigCommand {
-            kp_turn: config.kp_turn,
+            kp_move: config.kp_move,
             kp_hold: config.kp_hold,
             kp_straight: config.kp_straight,
             kp_velocity: config.kp_velocity,
