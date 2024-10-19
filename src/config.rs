@@ -9,6 +9,8 @@ pub struct Config {
     pub kp_hold: f32,
     pub kp_straight: f32,
     pub kp_velocity: f32,
+    pub imu_weight: f32,
+    pub backlash: i32,
 
     pub turn_accel_time: f32,
     pub straight_accel_time: f32,
@@ -34,6 +36,8 @@ pub fn read_config() -> Result<Config, Box<dyn std::error::Error>> {
             straight_accel_time: 0.5,
             friction: 0.12,
             dowel_off: 6.562, // CM
+            imu_weight: 0.6,
+            backlash: 20,
             reverse: false,
         };
 
@@ -71,6 +75,8 @@ pub fn config_command(
     friction: Option<f32>,
     dowel_off: Option<f32>,
     reverse: Option<bool>,
+    imu_weight: Option<f32>,
+    backlash: Option<i32>,
 ) -> Result<(), Box<dyn std::error::Error>> {
     let mut config = read_config()?;
     if let Some(v) = ticks_per_cm {
@@ -103,6 +109,12 @@ pub fn config_command(
     if let Some(v) = reverse {
         config.reverse = v;
     }
+    if let Some(v) = imu_weight {
+        config.imu_weight = v;
+    }
+    if let Some(v) = backlash {
+        config.backlash = v;
+    }
 
     save_config(&config)?;
 
@@ -117,6 +129,8 @@ pub fn config_command(
     println!("friction: {}", config.friction);
     println!("dowel_off: {}", config.dowel_off);
     println!("reverse: {}", config.reverse);
+    println!("imu_weight: {}", config.imu_weight);
+    println!("backlash: {}", config.backlash);
 
     Ok(())
 }

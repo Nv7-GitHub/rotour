@@ -50,6 +50,12 @@ enum Commands {
 
         #[arg(long)]
         reverse: Option<bool>,
+
+        #[arg(long)]
+        imu_weight: Option<f32>,
+
+        #[arg(long)]
+        backlash: Option<i32>,
     },
     #[command(about = "Run a self-test on the robot.")]
     SelfTest,
@@ -85,6 +91,8 @@ fn main() {
             friction,
             dowel_off,
             reverse,
+            imu_weight,
+            backlash,
         } => config_command(
             ticks_per_cm,
             kp_move,
@@ -96,6 +104,8 @@ fn main() {
             friction,
             dowel_off,
             reverse,
+            imu_weight,
+            backlash,
         ),
         Commands::SelfTest => connection::self_test(),
         Commands::Run { file } => run_path(file, config),
