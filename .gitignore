@@ -20,3 +20,5 @@ Cargo.lock
 
 # Rotour files
 *.rotour
+
+.DS_Store
