@@ -206,7 +206,14 @@ pub fn plan(path: PathBuf, config: Config) -> Result<PlanningResult, Box<dyn std
             two.abs()
         );
     }
-    println!("Approximate Velocity: {} ticks/second", velocity / vtime);
+    println!(
+        "\nApproximate Distance: {:.1} cm",
+        velocity / config.ticks_per_cm as f32
+    );
+    println!(
+        "Approximate Velocity: {:.1} ticks/second",
+        (velocity / vtime)
+    );
 
     Ok(PlanningResult {
         commands,

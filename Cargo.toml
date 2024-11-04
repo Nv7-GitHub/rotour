@@ -1,6 +1,6 @@
 [package]
 name = "rotour"
-version = "0.1.0"
+version = "0.1.1"
 edition = "2021"
 license-file = "LICENSE"
 description = "The path planner and motion profiler for the Tektite-R Robot Tour kit!"
