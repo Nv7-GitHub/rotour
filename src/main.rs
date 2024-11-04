@@ -52,10 +52,13 @@ enum Commands {
         reverse: Option<bool>,
 
         #[arg(long)]
-        imu_weight: Option<f32>,
+        reverse_enc: Option<bool>,
 
         #[arg(long)]
-        backlash: Option<i32>,
+        reverse_enc2: Option<bool>,
+
+        #[arg(long)]
+        imu_weight: Option<f32>,
     },
     #[command(about = "Run a self-test on the robot.")]
     SelfTest,
@@ -91,8 +94,9 @@ fn main() {
             friction,
             dowel_off,
             reverse,
+            reverse_enc,
+            reverse_enc2,
             imu_weight,
-            backlash,
         } => config_command(
             ticks_per_cm,
             kp_move,
@@ -104,8 +108,9 @@ fn main() {
             friction,
             dowel_off,
             reverse,
+            reverse_enc,
+            reverse_enc2,
             imu_weight,
-            backlash,
         ),
         Commands::SelfTest => connection::self_test(),
         Commands::Run { file } => run_path(file, config),

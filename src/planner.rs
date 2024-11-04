@@ -220,8 +220,10 @@ pub fn plan(path: PathBuf, config: Config) -> Result<PlanningResult, Box<dyn std
             friction: config.friction,
             dowel_off: config.dowel_off,
             reverse: if config.reverse { 1 } else { 0 },
+            reverse_enc: if config.reverse_enc { -1 } else { 1 },
+            reverse_enc2: if config.reverse_enc2 { -1 } else { 1 },
+
             imu_weight: config.imu_weight,
-            backlash: config.backlash,
 
             velocity, // TODO: Calculate velocity in ticks per cm
             velocity_twoff,

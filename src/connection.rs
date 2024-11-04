@@ -62,8 +62,9 @@ pub struct ConfigCommand {
     pub kp_velocity: f32,
     pub dowel_off: f32, // Distance of the dowel from the center in ticks
     pub imu_weight: f32,
-    pub backlash: i32,
     pub reverse: i32,
+    pub reverse_enc: i32,
+    pub reverse_enc2: i32,
 
     pub turn_accel_time: f32,
     pub straight_accel_time: f32,
@@ -98,8 +99,9 @@ pub fn self_test() -> Result<(), Box<dyn std::error::Error>> {
                 time: 10.0,
                 vtime: 10.0,
                 reverse: if config.reverse { 1 } else { 0 },
+                reverse_enc: if config.reverse_enc { -1 } else { 1 },
+                reverse_enc2: if config.reverse_enc2 { -1 } else { 1 },
                 imu_weight: config.imu_weight,
-                backlash: config.backlash,
             } as *const ConfigCommand as *const u8,
             mem::size_of::<ConfigCommand>(),
         )

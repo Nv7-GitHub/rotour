@@ -10,13 +10,15 @@ pub struct Config {
     pub kp_straight: f32,
     pub kp_velocity: f32,
     pub imu_weight: f32,
-    pub backlash: i32,
 
     pub turn_accel_time: f32,
     pub straight_accel_time: f32,
     pub friction: f32,
     pub dowel_off: f32,
+
     pub reverse: bool,
+    pub reverse_enc: bool,
+    pub reverse_enc2: bool,
 }
 
 // Read the config file
@@ -27,18 +29,19 @@ pub fn read_config() -> Result<Config, Box<dyn std::error::Error>> {
     if !config_path.exists() {
         // Create a default config if the file doesn't exist
         let default_config = Config {
-            ticks_per_cm: 84.6,
-            kp_move: 1.5,
+            ticks_per_cm: 100.0,
+            kp_move: 3.0,
             kp_hold: 0.01,
-            kp_straight: 2.5,
+            kp_straight: 3.0,
             kp_velocity: 0.000003,
-            turn_accel_time: 0.25,
-            straight_accel_time: 0.5,
-            friction: 0.12,
+            turn_accel_time: 0.4,
+            straight_accel_time: 0.35,
+            friction: 0.1,
             dowel_off: 6.562, // CM
-            imu_weight: 0.6,
-            backlash: 20,
+            reverse_enc: false,
+            reverse_enc2: false,
             reverse: false,
+            imu_weight: 1.0,
         };
 
         let config_str = toml::to_string(&default_config)?;
@@ -75,8 +78,9 @@ pub fn config_command(
     friction: Option<f32>,
     dowel_off: Option<f32>,
     reverse: Option<bool>,
+    reverse_enc: Option<bool>,
+    reverse_enc2: Option<bool>,
     imu_weight: Option<f32>,
-    backlash: Option<i32>,
 ) -> Result<(), Box<dyn std::error::Error>> {
     let mut config = read_config()?;
     if let Some(v) = ticks_per_cm {
@@ -112,8 +116,11 @@ pub fn config_command(
     if let Some(v) = imu_weight {
         config.imu_weight = v;
     }
-    if let Some(v) = backlash {
-        config.backlash = v;
+    if let Some(v) = reverse_enc {
+        config.reverse_enc = v;
+    }
+    if let Some(v) = reverse_enc2 {
+        config.reverse_enc2 = v;
     }
 
     save_config(&config)?;
@@ -129,8 +136,9 @@ pub fn config_command(
     println!("friction: {}", config.friction);
     println!("dowel_off: {}", config.dowel_off);
     println!("reverse: {}", config.reverse);
+    println!("reverse_enc: {}", config.reverse_enc);
+    println!("reverse_enc2: {}", config.reverse_enc2);
     println!("imu_weight: {}", config.imu_weight);
-    println!("backlash: {}", config.backlash);
 
     Ok(())
 }
